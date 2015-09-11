@@ -4,7 +4,7 @@ Plugin Name: Author Chat Plugin
 Plugin URI: http://smartfan.pl/
 Description: Plugin that gives your authors an easy way to communicate through back-end UI (admin panel).
 Author: Piotr Pesta
-Version: 1.2.0
+Version: 1.3.0
 Author URI: http://smartfan.pl/
 License: GPL12
 */
@@ -29,6 +29,10 @@ function pp_author_chat_activate() {
 		CHARACTER SET utf8 COLLATE utf8_bin
 		;");
 	add_option('author_chat_settings', 30);
+	add_option('author_chat_settings_access_editor', 1);
+	add_option('author_chat_settings_access_author', 1);
+	add_option('author_chat_settings_access_contributor', 1);
+	add_option('author_chat_settings_access_subscriber', 1);
 }
 
 // delete author_chat table
@@ -38,6 +42,10 @@ function pp_author_chat_uninstall() {
 	$wpdb->query( "DROP TABLE IF EXISTS $author_chat_table" );
 	delete_option('author_chat_settings');
 	delete_option('author_chat_settings_delete');
+	delete_option('author_chat_settings_access_editor');
+	delete_option('author_chat_settings_access_author');
+	delete_option('author_chat_settings_access_contributor');
+	delete_option('author_chat_settings_access_subscriber');
 }
 
 function pp_scripts_admin_chat(){
@@ -59,11 +67,16 @@ function pp_wp_dashboard_author_chat(){
 function register_author_chat_settings() {
 	register_setting( 'author_chat_settings_group', 'author_chat_settings');
 	register_setting( 'author_chat_settings_group', 'author_chat_settings_delete');
+	register_setting( 'author_chat_settings_group', 'author_chat_settings_access_editor');
+	register_setting( 'author_chat_settings_group', 'author_chat_settings_access_author');
+	register_setting( 'author_chat_settings_group', 'author_chat_settings_access_contributor');
+	register_setting( 'author_chat_settings_group', 'author_chat_settings_access_subscriber');
 }
 
 function pp_author_chat(){
 	global $current_user;
 	get_currentuserinfo();
+	if((get_option('author_chat_settings_access_subscriber') == '1' && $current_user->user_level == '0') || (get_option('author_chat_settings_access_contributor') == '1' && $current_user->user_level == '1') || (get_option('author_chat_settings_access_author') == '1' && $current_user->user_level == '2') || (get_option('author_chat_settings_access_editor') == '1' && $current_user->user_level == '3') || (get_option('author_chat_settings_access_editor') == '1' && $current_user->user_level == '4') || (get_option('author_chat_settings_access_editor') == '1' && $current_user->user_level == '5') || (get_option('author_chat_settings_access_editor') == '1' && $current_user->user_level == '6') || (get_option('author_chat_settings_access_editor') == '1' && $current_user->user_level == '7') || $current_user->user_level == '8' || $current_user->user_level == '9' || $current_user->user_level == '10'){
 ?>
 	
 	<script type="text/javascript">
@@ -146,7 +159,7 @@ function pp_author_chat(){
     </script>
 	
 	<?php
-	
+	}
 	pp_author_chat_clean_up_chat_history();
 	
 	if (get_option('author_chat_settings_delete') == 1){
