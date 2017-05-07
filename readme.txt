@@ -6,7 +6,7 @@ Tags: plugin, chat, author, for authors, admin, messages, internal chat, users c
 Author: Piotr Pesta
 Requires at least: 4.0
 Tested up to: 4.7
-Stable tag: 1.5.9
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,6 +40,9 @@ Or just add .zip file as a new plugin in your Wordpress administration panel.
 5. Author Chat - options and smaller chat window.
 
 == Changelog ==
+= 1.6.0 =
+* Bug fix
+* Final 1.6.0 version
 = 1.5.9 =
 * Lot's of changes (!big thanks to [Pablo Custo](https://github.com/pablocusto) for his very hard work on this version!)
 * Now you change the interval time for the verification of new messages from the AC Settings (1 to 10 secs).
