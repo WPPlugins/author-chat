@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/Pantsoffski/Author-Chat-Plugin
  * Description: Plugin that gives your authors an easy way to communicate through back-end UI (admin panel).
  * Author: Piotr Pesta
- * Version: 1.7.5
+ * Version: 1.8.0
  * Author URI: https://github.com/Pantsoffski
  * License: GPL12
  * Text Domain: author-chat
@@ -15,10 +15,13 @@ include 'pp-process.php';
 
 // Global Vars
 global $author_chat_version;
-$author_chat_version = '1.7.5';
+global $resultA;
+
+$author_chat_version = '1.8.0';
+$resultA = pp_author_chat_sec();
 
 global $author_chat_db_version;
-$author_chat_db_version = '1.1';
+$author_chat_db_version = '1.2';
 
 add_action('admin_menu', 'pp_author_chat_setup_menu');
 add_action('wp_dashboard_setup', 'pp_wp_dashboard_author_chat');
@@ -51,8 +54,9 @@ function pp_author_chat_activate() {
     global $wpdb;
 
     $author_chat_table = $wpdb->prefix . 'author_chat';
+    $author_chat_table_participants = $wpdb->prefix . 'author_chat_room_participants';
 
-    // Check if Database Table Exists
+    // Check if author_chat Database Table Exists
     if ($wpdb->get_var("SHOW TABLES LIKE '$author_chat_table'") != $author_chat_table) {
         // table not in database. Create new table
         $charset_collate = $wpdb->get_charset_collate();
@@ -62,8 +66,25 @@ function pp_author_chat_activate() {
 			user_id bigint(20) NOT NULL,
 			nickname tinytext NOT NULL,
 			content text NOT NULL,
+                        chat_room_id bigint(20) DEFAULT '0' NOT NULL,
 			date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-			PRIMARY KEY  (id)
+			PRIMARY KEY (id)
+			) $charset_collate;";
+
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+        dbDelta($sql);
+
+        // set current database version
+        add_option('author_chat_db_version', $author_chat_db_version);
+    } elseif ($wpdb->get_var("SHOW TABLES LIKE '$author_chat_table_participants'") != $author_chat_table_participants) { // Check if author_chat_room_participants Database Table Exists
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $author_chat_table_participants (
+			id bigint(50) NOT NULL AUTO_INCREMENT,
+			user_id bigint(20) NOT NULL,
+                        chat_room_id bigint(20) DEFAULT '0' NOT NULL,
+			PRIMARY KEY (id)
 			) $charset_collate;";
 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -74,10 +95,13 @@ function pp_author_chat_activate() {
         add_option('author_chat_db_version', $author_chat_db_version);
     } else {
         // Check for Database Updates
-        $updates = $wpdb->get_row("SELECT * FROM $author_chat_table");
-        if (!isset($updates->user_id)) {
+        if (!is_table_column_exists($author_chat_table, 'user_id')) {
             //Add user_id column if not present.
             $wpdb->query("ALTER TABLE $author_chat_table ADD user_id BIGINT(20) NOT NULL AFTER id");
+        }
+        if (!is_table_column_exists($author_chat_table, 'chat_room_id')) {
+            //Add chat_room column if not present.
+            $wpdb->query("ALTER TABLE $author_chat_table ADD chat_room_id BIGINT(20) DEFAULT '0' NOT NULL AFTER content");
         }
     }
 
@@ -105,7 +129,9 @@ function pp_author_chat_deactivate() {
 function pp_author_chat_uninstall() {
     global $wpdb;
     $author_chat_table = $wpdb->prefix . 'author_chat';
+    $author_chat_table_participants = $wpdb->prefix . 'author_chat_room_participants';
     $wpdb->query("DROP TABLE IF EXISTS $author_chat_table");
+    $wpdb->query("DROP TABLE IF EXISTS $author_chat_table_participants");
     delete_option('author_chat_settings');
     delete_option('author_chat_settings_access_all_users');
     delete_option('author_chat_settings_access_author');
@@ -125,10 +151,12 @@ function pp_author_chat_uninstall() {
 // Enqueue JavaScript & CSS files
 function pp_scripts_admin_chat() {
     global $author_chat_version;
+    global $resultA;
     wp_enqueue_script('author-chat-script', plugins_url('chat.js', __FILE__), array('jquery'), $author_chat_version, true);
     wp_enqueue_style('author-chat-style', plugins_url('author-chat-style.css', __FILE__), array(), $author_chat_version);
     wp_enqueue_style('wp-jquery-ui-dialog');
     wp_enqueue_script('jquery-ui-dialog');
+    wp_enqueue_script('jquery-ui-autocomplete');
 
     // set localize variables for send to the JS
     $current_user = wp_get_current_user();
@@ -137,6 +165,7 @@ function pp_scripts_admin_chat() {
         (
         'user_id' => $current_user->ID,
         'nickname' => $username,
+        'result_a' => $resultA,
         'you_are' => __('You are:', 'author-chat'),
         'today' => __('Today', 'default'),
         'yesterday' => __('Yesterday', 'author-chat'),
@@ -160,7 +189,7 @@ function pp_author_chat_setup_menu() {
 
     $optionsTitle = __('Author Chat Options', 'author-chat');
     $pluginName = __('Author Chat', 'author-chat');
-    add_dashboard_page($pluginName, $pluginName, 'read', 'author-chat', 'pp_author_chat');
+    //add_dashboard_page($pluginName, $pluginName, 'read', 'author-chat', 'pp_author_chat'); //dashboard page temporary removed
     add_menu_page($optionsTitle, $pluginName, 'administrator', 'acset', 'author_chat_settings', 'dashicons-carrot');
     add_action('admin_init', 'register_author_chat_settings');
 }
@@ -197,7 +226,7 @@ function pp_plugin_action_links_ac($links) { //Add settings link to plugins page
 }
 
 function pp_author_chat() {
-    $resultA = pp_author_chat_sec();
+    global $resultA;
     $current_user = wp_get_current_user();
     $current_screen = get_current_screen();
 
@@ -207,16 +236,45 @@ function pp_author_chat() {
 
             <h2 class="ac-title"><?php _e('Author Chat', 'author-chat'); ?></h2>
 
-            <div class="ac-user"></div>
+<!--            <div class="ac-user"></div>-->
+            
+            <div id="ac-rooms-add-btn-wrapper"><span id="ac-rooms"></span><span id="ac-private-conversation"></span></div>
+            <div id="ac-search-user"></div>
+            <div id="ac-room-users-list"></div>
+<!--            Hidden dialog messages-->
+            <div id="ac-only-owner" title="NO! Bad user!">
+                <p>Only chat room owner (User that created chat room) can delete users!</p>
+            </div>
+            <div id="ac-wait-sec" title="NO! Bad user!">
+                <p>Wait a sec!</p>
+            </div>
+            <div id="ac-p-warn" title="<?php _e('Buy Premium Version ($10.99)', 'author-chat'); ?>">
+                <p>Buy premium version to add more chat rooms!</p>
+                <p><b style="color:#b11b1b;">$10.99 <?php _e('for lifetime 1 domain licence', 'author-chat'); ?>.</b>
+                    (<i><?php _e('future premium features included', 'author-chat'); ?></i>)</p>
+                <div class="ac-pp">
+                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                        <input type="hidden" name="cmd" value="_s-xclick">
+                        <input type="hidden" name="hosted_button_id" value="5TGRZ4BSETP9G">
+                        <table>
+                            <tr><td><input type="hidden" name="on0" value="Domain name"><?php _e('If your domain name is correct, do not change it. Activation can take up to 24 hours! If you have any problems contact me at piotr.pesta@gmail.com', 'author-chat'); ?></td></tr><tr><td><input type="text" name="os0" maxlength="200" value="<?php echo $_SERVER['HTTP_HOST']; ?>"></td></tr>
+                        </table>
+                        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                        <img alt="" border="0" src="https://www.paypalobjects.com/pl_PL/i/scr/pixel.gif" width="1" height="1">
+                    </form>
+                </div>
+            </div>
+
 
             <div class="ac-wrap">
                 <div id="author-chat-area" class="ac-animation">
                     <div class="ac-top-date"></div>
                     <ul></ul>
-                    <div class="ac-tobottom ac-animation ac-hidden"><span class="ac-icon-down"></span></div>
+<!--                    <div class="ac-tobottom ac-animation ac-hidden"><span class="ac-arrow"></span></div>-->
                 </div>
+                
                 <?php if ($current_screen->base == 'dashboard_page_author-chat' || $current_screen->base == 'dashboard' || $resultA === true) { ?>
-                </div>
+            </div>
                 <form class="ac-text-form">
                     <textarea class="ac-textarea" maxlength = "1000" placeholder="<?php _e('Your message...', 'author-chat'); ?>"></textarea>
                 </form>
@@ -244,7 +302,7 @@ function pp_author_chat() {
 }
 
 function pp_author_chat_chat_on_top() {
-    $resultA = pp_author_chat_sec();
+    global $resultA;
     $current_screen = get_current_screen();
     ?>
     <script type="text/javascript">
@@ -345,6 +403,9 @@ function pp_author_chat_chat_on_top() {
                 var $_chatArea = $_dialogWindow.find('#author-chat-area');
                 var dialog_offset = $_dialogWindow.offset();
                 var $_wpAdminBar = jQuery('#wpadminbar');
+                var $_roomBtnWrapper = jQuery('#ac-rooms-add-btn-wrapper');
+                var $_searchUserBar = jQuery('#ac-search-user');
+                var $_roomUsers = jQuery('#ac-room-users-list');
 
                 /* Set Floating Window as Sidebar */
                 /*--------------------------------*/
@@ -373,7 +434,7 @@ function pp_author_chat_chat_on_top() {
                     $_dialogWindow.css('top', $_wpAdminBar.outerHeight() + 'px');
 
                     var outside = $_dialogWindow.outerHeight() - $_chatArea.outerHeight();
-                    $_chatArea.css('height', (jQuery(window).height() - $_wpAdminBar.outerHeight() - outside - 10) + 'px');
+                    $_chatArea.css('height', (jQuery(window).height() - $_wpAdminBar.outerHeight() - outside - 130) + 'px'); // -10 was a default value
 
                     chat.setLocalData('ac_dialog_is_sidebar', true);
                 }
@@ -580,7 +641,7 @@ function pp_author_chat_chat_on_top() {
             <div id="author-chat-window" class="ac-animation" title="<?php _e('Author Chat', 'author-chat'); ?>">
                 <?php pp_author_chat(); ?>
             </div>
-            <div id="author-chat-buy" title="<?php _e('Buy Premium Version', 'author-chat'); ?>">
+            <div id="author-chat-buy" title="<?php _e('Buy Premium Version ($10.99)', 'author-chat'); ?>">
                 <div class="ac-pp">
                     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
                         <input type="hidden" name="cmd" value="_s-xclick">
@@ -655,6 +716,18 @@ function pp_author_chat_sec() {
     return $result;
 }
 
+/* Function returns true if table column in database exists, otherwise return false */
+function is_table_column_exists($table_name, $column_name) {
+    global $wpdb;
+    $column = $wpdb->get_results($wpdb->prepare(
+                    "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s ", DB_NAME, $table_name, $column_name
+            ));
+    if (!empty($column)) {
+        return true;
+    }
+    return false;
+}
+
 function pp_author_chat_rest_api() {
     register_rest_route('author-chat/v2', '/chat/', array(
         'methods' => 'POST',
@@ -683,10 +756,12 @@ function pp_chat_rest($data) {
     }
 
     if ($data['msg'] == "2358") {
-        $lines = $wpdb->get_results("SELECT id, user_id, nickname, content, date FROM $author_chat_table ORDER BY id ASC", ARRAY_A);
+        $lines = $wpdb->get_results("SELECT id, user_id, nickname, content, chat_room_id, date FROM $author_chat_table ORDER BY id ASC", ARRAY_A);
         $text = array();
         foreach ($lines as $line) {
-            $text[] = $line;
+            if ($line['chat_room_id'] == 0) { // Show only main chat room conversation
+                    $text[] = $line;
+                }
         }
         $date = array_column($text, 'date');
         array_walk_recursive($date, function( &$element ) {

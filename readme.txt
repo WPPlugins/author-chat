@@ -5,16 +5,18 @@ Plugin Name: Author Chat
 Tags: plugin, chat, author, for authors, admin, messages, internal chat, users chat, user, dashboard chat, dashboard, admin menu chat
 Author: Piotr Pesta
 Requires at least: 4.0
-Tested up to: 4.8
-Stable tag: 1.7.5
+Tested up to: 4.9
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Author Chat is an internal chat that let your authors (users with access to dashboard) to chat with each other. It is easy to use.
+Author Chat is an internal chat that let your authors (users with access to dashboard) to chat with each other. It is easy to use and supports private chat rooms.
 
 == Description ==
 
 [Author Chat](https://github.com/Pantsoffski/Author-Chat-Plugin) is an internal chat that let your authors (users with access to admin panel) to chat with each other. It is easy to use. All chat data is stored in database. You can also configure how many days chat history should be stored in database, change the interval time for the verification of new messages, show or hide our name in the messages and many more.
+
+Author Chat now supports private chat/chat rooms.
 
 You can also download Author Chat client for Android, and run chat on your smartphone. App is available here: [Google Play](https://play.google.com/store/apps/details?id=pl.ordin.authorchatforwordpress)
 
@@ -35,11 +37,12 @@ Or just add .zip file as a new plugin in your Wordpress administration panel.
 
 1. Author Chat - stretched window on the right side.
 2. Author Chat - stretched window on the right side of WYSWIG editor.
-3. Author Chat - dedicated view.
-4. Author Chat - dashboard view.
-5. Author Chat - options and smaller chat window.
+3. Author Chat - dashboard view.
+4. Author Chat - options and smaller chat window.
 
 == Changelog ==
+= 1.8.0 =
+* Now you can create private chat rooms.
 = 1.7.5 =
 * Author Chat for Android - code optimization so you can send messages from smartphone
 = 1.7.0 =
