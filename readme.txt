@@ -6,7 +6,7 @@ Tags: plugin, chat, author, for authors, admin, messages, internal chat, users c
 Author: Piotr Pesta
 Requires at least: 4.0
 Tested up to: 5.7
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,10 @@ Author Chat now supports private chat/chat rooms.
 You can also download Author Chat client for Android, and run chat on your smartphone. App is available here: [Google Play](https://play.google.com/store/apps/details?id=pl.ordin.authorchat)
 
 If you wish to translate plugin, just add your translation file to /lang/ folder.
+
+== Using 3rd party service ==
+
+Please note that this plugin is relying on a 3rd party service, which is the Google Firebase Cloud Messaging service (FCM) and your data is being sent through their servers via HTTP API (https://fcm.googleapis.com/fcm/send). This is very legal to use the Google Firebase Cloud Messaging service (FCM), based on their terms and conditions https://firebase.google.com/terms/.
 
 == Installation ==
 
@@ -39,6 +43,8 @@ Or just add .zip file as a new plugin in your Wordpress administration panel.
 4. Author Chat - options and smaller chat window.
 
 == Changelog ==
+= 2.0.3 =
+* Minor bug fix.
 = 2.0.2 =
 * Fixed bug: "jQuery.fn.load() is deprecated"
 * Wordpress 5.5 compatibility
