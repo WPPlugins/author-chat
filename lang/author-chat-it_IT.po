@@ -5,7 +5,7 @@
 # Previous PO revision: 2019-03-05 15:12+0100
 msgid ""
 msgstr ""
-"Project-Id-Version: Author Chat 2.1.1\n"
+"Project-Id-Version: Author Chat 2.1.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/author-chat\n"
 "Last-Translator: \n"
 "Language-Team: Pablo Custo\n"
@@ -381,3 +381,27 @@ msgstr "Rimuovi partecipante: %s"
 #: acppauthorchat_chat.js:915
 msgid "Only the room owner can remove participants."
 msgstr "Solo chi possiede la stanza può rimuovere i partecipanti."
+
+#: class-acppauthorchat-review-prompt.php:80
+msgid "Have you tried Author Chat?"
+msgstr "Hai provato Author Chat?"
+
+#: class-acppauthorchat-review-prompt.php:81
+msgid "We'd love to hear about your experience. Your feedback helps us improve the plugin and supports its continued development."
+msgstr "Ci piacerebbe conoscere la tua esperienza. La tua opinione ci aiuta a migliorare il plugin e a portarne avanti lo sviluppo."
+
+#: class-acppauthorchat-review-prompt.php:84
+msgid "Leave a review"
+msgstr "Lascia una recensione"
+
+#: class-acppauthorchat-review-prompt.php:85
+msgid "Don't show again"
+msgstr "Non mostrare più"
+
+#: class-acppauthorchat-review-prompt.php:86
+msgid "Dismiss review request"
+msgstr "Chiudi la richiesta di recensione"
+
+#: acppauthorchat-process.php:359
+msgid "This history is too large to load at once. Use paginated history."
+msgstr "La cronologia è troppo grande per essere caricata in una volta sola. Caricala una pagina alla volta."

@@ -17,6 +17,7 @@ function acppauthorchat_settings_page() {
     ?>
     <div class="wrap">
         <h1><?php esc_html_e('Author Chat settings', 'author-chat'); ?></h1>
+		<?php ACPPAuthorChat_Review_Prompt::render(); ?>
         <?php
         if (isset($_GET['acppauthorchat_result'], $_GET['acppauthorchat_nonce']) && is_string($_GET['acppauthorchat_nonce']) &&
             wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['acppauthorchat_nonce'])), 'acppauthorchat_prune_result')) {

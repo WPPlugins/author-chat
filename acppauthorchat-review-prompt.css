@@ -1,0 +1,16 @@
+.acppauthorchat-review {
+	position: relative;
+	padding-inline-end: 40px;
+}
+
+.acppauthorchat-review h2 {
+	margin-block: 12px 4px;
+}
+
+.acppauthorchat-review-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 12px;
+	margin-block: 8px 12px;
+}

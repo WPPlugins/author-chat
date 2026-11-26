@@ -43,7 +43,7 @@ function acppauthorchat_uninstall_site() {
             if (acppauthorchat_owns_key($hook)) { wp_unschedule_hook($hook); }
         }
     }
-    // No plugin-owned user/post metadata exists. In particular, keep shared nicknames.
+	// Review state is covered by the namespaced options above. Keep shared user nicknames.
 }
 
 /** Clean all sites/networks without loading the plugin or running a migration. */

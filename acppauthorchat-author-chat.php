@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/Pantsoffski/Author-Chat-Plugin
  * Description: Plugin that gives your authors an easy way to communicate through back-end UI (admin panel).
  * Author: Piotr Pesta
- * Version: 2.1.2
+ * Version: 2.1.3
  * Author URI: https://github.com/Pantsoffski
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,11 +20,12 @@ if (!defined('ABSPATH')) {
 require_once __DIR__ . '/acppauthorchat-process.php';
 require_once __DIR__ . '/acppauthorchat-schema.php';
 require_once __DIR__ . '/acppauthorchat-options.php';
+require_once __DIR__ . '/class-acppauthorchat-review-prompt.php';
 
 // Global Vars
 global $acppauthorchat_version;
 
-$acppauthorchat_version = '2.1.2';
+$acppauthorchat_version = '2.1.3';
 
 global $acppauthorchat_db_version;
 $acppauthorchat_db_version = '2.0';
@@ -159,11 +160,26 @@ function acppauthorchat_scripts_admin_chat() {
     wp_localize_script('acppauthorchat-author-chat-script', 'acppauthorchat_config', $values);
 }
 
+/** Register the Author Chat settings screen and its review notice. */
 function acppauthorchat_setup_menu() {
+	$hook = add_menu_page(
+		__( 'Author Chat Options', 'author-chat' ),
+		__( 'Author Chat', 'author-chat' ),
+		'manage_options',
+		'acppauthorchat-settings',
+		'acppauthorchat_settings_page',
+		'dashicons-format-chat'
+	);
+	if ( $hook ) {
+		add_action( 'load-' . $hook, array( 'ACPPAuthorChat_Review_Prompt', 'dismiss' ) );
+		add_action( 'admin_print_styles-' . $hook, 'acppauthorchat_enqueue_review_style' );
+	}
+}
 
-    $optionsTitle = __('Author Chat Options', 'author-chat');
-    $pluginName = __('Author Chat', 'author-chat');
-    add_menu_page($optionsTitle, $pluginName, 'manage_options', 'acppauthorchat-settings', 'acppauthorchat_settings_page', 'dashicons-format-chat');
+/** Load the review notice styles on the settings screen. */
+function acppauthorchat_enqueue_review_style() {
+	global $acppauthorchat_version;
+	wp_enqueue_style( 'acppauthorchat-review-prompt', plugins_url( 'acppauthorchat-review-prompt.css', __FILE__ ), array(), $acppauthorchat_version );
 }
 
 function acppauthorchat_wp_dashboard() {

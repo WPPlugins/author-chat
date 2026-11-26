@@ -5,7 +5,7 @@ var __ = wp.i18n.__;
 var _n = wp.i18n._n;
 var sprintf = wp.i18n.sprintf;
 var wpDate = wp.date;
-/*  Author Chat  v2.1.2  */
+/*  Author Chat  v2.1.3  */
 /**************************/
 
 /* global acppauthorchat_config */
@@ -86,7 +86,7 @@ _proto_.bindEvents = function () {
 
     // The textarea maxlength attribute handles input limits without blocking navigation keys.
     /* watch textarea for release of key press */
-    jQuery('#author-chat .ac-textarea').keyup(function (event)
+    jQuery('#author-chat .ac-textarea').on('keyup', function (event)
     {
         var $me = jQuery(this);
 
@@ -110,23 +110,23 @@ _proto_.bindEvents = function () {
     });
 
     /* Set focus on textarea with just click inside the Chat Area */
-    $_chatArea.mouseup(function (event) {
+    $_chatArea.on('mouseup', function (event) {
         /* don't make focus on right click or if we select some text */
         if (event.which === 1 && window.getSelection().toString() === '')
         {
-            jQuery('#author-chat .ac-textarea').focus();
+            jQuery('#author-chat .ac-textarea').trigger('focus');
         }
 
     });
 
     /* Set onBlur event of current window */
-    jQuery(window).blur(function ()
+    jQuery(window).on('blur', function ()
     {
         $this.win_is_focus = false;
     });
 
     /* Set onFocus event of current window */
-    jQuery(window).focus(function ()
+    jQuery(window).on('focus', function ()
     {
         $this.win_is_focus = true;
         if ($this.count)

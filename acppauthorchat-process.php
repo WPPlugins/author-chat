@@ -318,6 +318,59 @@ function acppauthorchat_legacy_date($value, $offset = 0) {
     return false === $timestamp ? '' : gmdate('Y-m-d,H:i:s', $timestamp + (int) round($offset * 3600));
 }
 
+/**
+ * Build an AJAX history response using bounded database reads.
+ *
+ * @param int      $room_id  Room to read.
+ * @param int|null $after_id Cursor, or null for the legacy response format.
+ * @param float    $offset   Legacy timezone offset in hours.
+ * @return array|WP_Error History payload or a controlled error.
+ */
+function acppauthorchat_ajax_history( $room_id, $after_id, $offset ) {
+	$legacy = null === $after_id;
+	$cursor = $after_id ?? 0;
+	$result = array(
+		'id'   => array(),
+		'uid'  => array(),
+		'nick' => array(),
+		'msg'  => array(),
+		'date' => array(),
+	);
+	if ( $legacy ) {
+		$limit     = ini_parse_quantity( ini_get( 'memory_limit' ) );
+		$remaining = 8 * 1024 * 1024;
+		if ( $limit > 0 ) {
+			// Leave room for database buffers, PHP arrays and escaped JSON.
+			$remaining = min( $remaining, intdiv( max( 0, $limit - memory_get_usage( true ) ), 8 ) );
+		}
+	}
+
+	do {
+		$rows = acppauthorchat_read_messages( $room_id, $cursor );
+		if ( is_wp_error( $rows ) ) {
+			return $rows;
+		}
+		$page = acppauthorchat_history_page( $rows, $cursor );
+		foreach ( $rows as $row ) {
+			if ( $legacy ) {
+				// Account for fixed fields and per-row overhead even when the text is short.
+				$remaining -= 128 + strlen( $row['nickname'] ) + strlen( $row['content'] );
+				if ( $remaining < 0 ) {
+					return new WP_Error( 'author_chat_history_too_large', __( 'This history is too large to load at once. Use paginated history.', 'author-chat' ), array( 'status' => 413 ) );
+				}
+			}
+			$result['id'][]   = $row['id'];
+			$result['uid'][]  = $row['user_id'];
+			$result['nick'][] = $row['nickname'];
+			$result['msg'][]  = $row['content'];
+			$result['date'][] = acppauthorchat_legacy_date( $row['date'], $offset );
+		}
+		$cursor = $page['next_id'];
+	} while ( $legacy && $page['has_more'] );
+
+	return $legacy ? $result : array_merge( $result, $page );
+}
+
 function acppauthorchat_ajax() {
     if (!is_user_logged_in()) {
         $result = new WP_Error('author_chat_session_expired', __('Please sign in again.', 'author-chat'), array('status' => 401));
@@ -398,22 +451,7 @@ function acppauthorchat_ajax_operation($input) {
         if (is_wp_error($after_id)) {
             return $after_id;
         }
-        $rows = acppauthorchat_read_messages($room_id, $after_id);
-        if (is_wp_error($rows)) {
-            return $rows;
-        }
-        $result = array('id' => array(), 'uid' => array(), 'nick' => array(), 'msg' => array(), 'date' => array());
-        if (null !== $after_id) {
-            $result = array_merge($result, acppauthorchat_history_page($rows, $after_id));
-        }
-        foreach ($rows as $row) {
-            $result['id'][] = $row['id'];
-            $result['uid'][] = $row['user_id'];
-            $result['nick'][] = $row['nickname'];
-            $result['msg'][] = $row['content'];
-            $result['date'][] = acppauthorchat_legacy_date($row['date'], (float) $offset);
-        }
-        return $result;
+		return acppauthorchat_ajax_history( $room_id, $after_id, (float) $offset );
     }
     if ('searchUser' === $operation) {
         if (!isset($input['search_user']) || !is_string($input['search_user']) || strlen($input['search_user']) > 200) {

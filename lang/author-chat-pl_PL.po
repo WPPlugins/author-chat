@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Author Chat 2.1.1\n"
+"Project-Id-Version: Author Chat 2.1.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/author-chat\n"
 "Last-Translator: Pablo Custo <pablocusto@gmail.com>\n"
 "Language-Team: Piotr Pesta\n"
@@ -379,3 +379,27 @@ msgstr "Usuń uczestnika: %s"
 #: acppauthorchat_chat.js:915
 msgid "Only the room owner can remove participants."
 msgstr "Tylko właściciel pokoju może usuwać uczestników."
+
+#: class-acppauthorchat-review-prompt.php:80
+msgid "Have you tried Author Chat?"
+msgstr "Czy znasz już Chat autorów?"
+
+#: class-acppauthorchat-review-prompt.php:81
+msgid "We'd love to hear about your experience. Your feedback helps us improve the plugin and supports its continued development."
+msgstr "Chętnie poznamy Twoje doświadczenia. Twoja opinia pomaga nam ulepszać wtyczkę i wspiera jej dalszy rozwój."
+
+#: class-acppauthorchat-review-prompt.php:84
+msgid "Leave a review"
+msgstr "Dodaj recenzję"
+
+#: class-acppauthorchat-review-prompt.php:85
+msgid "Don't show again"
+msgstr "Nie pokazuj ponownie"
+
+#: class-acppauthorchat-review-prompt.php:86
+msgid "Dismiss review request"
+msgstr "Zamknij prośbę o recenzję"
+
+#: acppauthorchat-process.php:359
+msgid "This history is too large to load at once. Use paginated history."
+msgstr "Ta historia jest zbyt duża, aby wczytać ją w całości. Wczytuj historię stronami."

@@ -66,3 +66,27 @@ msgstr "Author Chat"
 #: pp-author-chat.php:190 pp-options.php:7
 msgid "Author Chat Options"
 msgstr "تنظیمات پیام رسان"
+
+#: class-acppauthorchat-review-prompt.php:80
+msgid "Have you tried Author Chat?"
+msgstr "آیا گفت‌وگوی نویسندگان را امتحان کرده‌اید؟"
+
+#: class-acppauthorchat-review-prompt.php:81
+msgid "We'd love to hear about your experience. Your feedback helps us improve the plugin and supports its continued development."
+msgstr "دوست داریم از تجربهٔ شما بشنویم. بازخورد شما به ما کمک می‌کند افزونه را بهبود دهیم و به توسعهٔ آن ادامه دهیم."
+
+#: class-acppauthorchat-review-prompt.php:84
+msgid "Leave a review"
+msgstr "نوشتن دیدگاه"
+
+#: class-acppauthorchat-review-prompt.php:85
+msgid "Don't show again"
+msgstr "دوباره نشان نده"
+
+#: class-acppauthorchat-review-prompt.php:86
+msgid "Dismiss review request"
+msgstr "بستن درخواست دیدگاه"
+
+#: acppauthorchat-process.php:359
+msgid "This history is too large to load at once. Use paginated history."
+msgstr "این تاریخچه برای بارگیری یک‌باره بیش از حد بزرگ است. تاریخچه را صفحه‌به‌صفحه بارگیری کنید."

@@ -3,7 +3,7 @@
 # Local draft for linguistic review.
 msgid ""
 msgstr ""
-"Project-Id-Version: Author Chat 2.1.1\n"
+"Project-Id-Version: Author Chat 2.1.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/author-chat\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -379,3 +379,27 @@ msgstr "Retirer de la salle : %s"
 #: acppauthorchat_chat.js:915
 msgid "Only the room owner can remove participants."
 msgstr "Seul le propriétaire de la salle peut retirer des participants."
+
+#: class-acppauthorchat-review-prompt.php:80
+msgid "Have you tried Author Chat?"
+msgstr "Avez-vous essayé Author Chat ?"
+
+#: class-acppauthorchat-review-prompt.php:81
+msgid "We'd love to hear about your experience. Your feedback helps us improve the plugin and supports its continued development."
+msgstr "Nous aimerions connaître votre expérience. Votre avis nous aide à améliorer l’extension et à poursuivre son développement."
+
+#: class-acppauthorchat-review-prompt.php:84
+msgid "Leave a review"
+msgstr "Laisser un avis"
+
+#: class-acppauthorchat-review-prompt.php:85
+msgid "Don't show again"
+msgstr "Ne plus afficher"
+
+#: class-acppauthorchat-review-prompt.php:86
+msgid "Dismiss review request"
+msgstr "Fermer la demande d’avis"
+
+#: acppauthorchat-process.php:359
+msgid "This history is too large to load at once. Use paginated history."
+msgstr "L’historique est trop volumineux pour être chargé en une seule fois. Chargez-le page par page."

@@ -2,9 +2,9 @@
 Contributors: piotr-pesta
 Tags: chat, dashboard, collaboration, messages
 Requires at least: 6.9
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 8.2
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,7 +56,7 @@ No. Author Chat uses your WordPress installation and existing accounts. The chat
 
 = Are push notifications available? =
 
-Version 2.1.2 can play a bundled notification sound while an admin page is open. Push notifications and support for the Android companion app are unavailable in this release.
+Author Chat can play a bundled notification sound while an admin page is open. Push notifications and support for the Android companion app are unavailable in this release.
 
 = How can I delete old messages? =
 
@@ -69,6 +69,8 @@ Open **Author Chat** in the admin menu, save an age threshold, and separately co
 Author Chat stores messages, sender IDs, nicknames, timestamps, room memberships, and room reservation IDs in the site's database. Access restrictions apply within the plugin. Anyone with direct access to the database or its backups can read the stored records.
 
 The plugin makes no automatic outbound HTTP requests. It includes no analytics, payment forms, remote images, link previews, or push delivery. The notification sound is bundled locally, and emoticons are Unicode characters rendered by the device's fonts.
+
+The plugin records the first Author Chat settings visit, a visit count up to three, and whether it has shown the review request. This state is stored locally per site and per user with permission to manage the settings. The review link opens WordPress.org when clicked.
 
 Opening a link in a message takes the user to the chosen destination. Author Chat does not request a preview. WordPress core, browsers, and other plugins may make their own network requests. Legacy preview, payment, and deletion settings remain stored but are inactive.
 
@@ -87,7 +89,7 @@ Deleting Author Chat through WordPress permanently removes its three tables, set
 3. Open **Author Chat** in the WordPress admin menu to review access and display settings. Open **Dashboard** to use the chat.
 4. On large sites, schedule a maintenance window for index creation and let requests running older plugin code finish before updating. Schema upgrades are additive and record their version after verification.
 
-Author Chat requires WordPress 6.9 or later and PHP 8.2 or later. Release validation used MariaDB with WordPress 6.9 and PHP 8.2, and with WordPress 7.1.5 and PHP 8.3. Validate other combinations before rollout. Guarded writes, including message sends and membership changes, require binary logging to be disabled or configured for ROW or MIXED logging.
+Author Chat requires WordPress 6.9 or later and PHP 8.2 or later. Release validation used MariaDB with WordPress 6.9 and PHP 8.2, and with WordPress 7.2 RC3 and PHP 8.6. Guarded writes, including message sends and membership changes, require binary logging to be disabled or configured for ROW or MIXED logging.
 
 == Screenshots ==
 
@@ -105,6 +107,13 @@ Thanks to Pablo Custo for earlier code and interface contributions, and to the c
 The original synthesized notification tone is bundled as `notifyauthorchat.wav`. Its reproducible source is `assets/generate-notification.cjs`, distributed under the same license. The former `emoticons.png` and `notifyauthorchat.ogg` files were removed because the repository contained no separate record of their provenance.
 
 == Changelog ==
+
+= 2.1.3 =
+* Add a one-time review request in Author Chat settings after at least seven days and three visits.
+* Translate the review request in the bundled language catalogs.
+* Update chat event handlers to avoid deprecated jQuery event shortcuts.
+* Limit oversized legacy history responses to protect server memory. Paginated history remains available.
+* Verify compatibility with WordPress 7.2 RC3 and PHP 8.6.
 
 = 2.1.2 =
 * Expanded PHP and JavaScript translations across the dashboard chat, floating panel, and settings.
@@ -130,6 +139,9 @@ The original synthesized notification tone is bundled as `notifyauthorchat.wav`.
 * Historical release with a minor bug fix.
 
 == Upgrade Notice ==
+
+= 2.1.3 =
+This update adds a one-time review request to Author Chat settings and preserves existing messages, rooms, memberships, and settings.
 
 = 2.1.2 =
 This update expands interface translations and improves dates, plural forms, and accessibility messages. It preserves existing messages, settings, room IDs, and memberships. Reload any open chat pages after updating.
